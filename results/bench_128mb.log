@@ -1,0 +1,225 @@
+##### 128mb read_entity solution_a
+pgbench (17.11)
+transaction type: /tmp/bench/a_read_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 636828
+number of failed transactions: 0 (0.000%)
+latency average = 0.094 ms
+initial connection time = 3.515 ms
+tps = 42464.666790 (without initial connection time)
+
+##### 128mb read_entity solution_b
+pgbench (17.11)
+transaction type: /tmp/bench/b_read_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 572918
+number of failed transactions: 0 (0.000%)
+latency average = 0.105 ms
+initial connection time = 3.255 ms
+tps = 38202.331703 (without initial connection time)
+
+##### 128mb read_entity solution_c
+pgbench (17.11)
+transaction type: /tmp/bench/c_read_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 725143
+number of failed transactions: 0 (0.000%)
+latency average = 0.083 ms
+initial connection time = 3.462 ms
+tps = 48353.301309 (without initial connection time)
+
+##### 128mb read_static solution_a
+pgbench (17.11)
+transaction type: /tmp/bench/a_read_static.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 35624
+number of failed transactions: 0 (0.000%)
+latency average = 1.684 ms
+initial connection time = 3.623 ms
+tps = 2375.217251 (without initial connection time)
+
+##### 128mb read_static solution_b
+pgbench (17.11)
+transaction type: /tmp/bench/b_read_static.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 34553
+number of failed transactions: 0 (0.000%)
+latency average = 1.736 ms
+initial connection time = 3.565 ms
+tps = 2303.759716 (without initial connection time)
+
+##### 128mb read_static solution_c
+pgbench (17.11)
+transaction type: /tmp/bench/c_read_static.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 116554
+number of failed transactions: 0 (0.000%)
+latency average = 0.515 ms
+initial connection time = 3.649 ms
+tps = 7771.942816 (without initial connection time)
+
+##### 128mb update_status solution_a
+pgbench (17.11)
+transaction type: /tmp/bench/a_update_status.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 9433
+number of failed transactions: 0 (0.000%)
+latency average = 6.361 ms
+initial connection time = 3.522 ms
+tps = 628.796409 (without initial connection time)
+
+##### 128mb update_status solution_b
+pgbench (17.11)
+transaction type: /tmp/bench/b_update_status.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 10823
+number of failed transactions: 0 (0.000%)
+latency average = 5.543 ms
+initial connection time = 4.207 ms
+tps = 721.614635 (without initial connection time)
+
+##### 128mb update_status solution_c
+pgbench (17.11)
+transaction type: /tmp/bench/c_update_status.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 10099
+number of failed transactions: 0 (0.000%)
+latency average = 5.941 ms
+initial connection time = 3.375 ms
+tps = 673.254054 (without initial connection time)
+
+##### 128mb delete_entity solution_a
+pgbench (17.11)
+transaction type: /tmp/bench/a_delete_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 296583
+number of failed transactions: 0 (0.000%)
+latency average = 0.202 ms
+initial connection time = 4.823 ms
+tps = 19778.234999 (without initial connection time)
+
+##### 128mb delete_entity solution_b
+pgbench (17.11)
+transaction type: /tmp/bench/b_delete_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 238936
+number of failed transactions: 0 (0.000%)
+latency average = 0.251 ms
+initial connection time = 3.824 ms
+tps = 15932.825751 (without initial connection time)
+
+##### 128mb delete_entity solution_c
+pgbench (17.11)
+transaction type: /tmp/bench/c_delete_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 323241
+number of failed transactions: 0 (0.000%)
+latency average = 0.186 ms
+initial connection time = 3.496 ms
+tps = 21554.071486 (without initial connection time)
+
+##### 128mb insert_entity solution_a
+pgbench (17.11)
+transaction type: /tmp/bench/a_insert_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 12701
+number of failed transactions: 0 (0.000%)
+latency average = 4.724 ms
+initial connection time = 3.399 ms
+tps = 846.675477 (without initial connection time)
+
+##### 128mb insert_entity solution_b
+pgbench (17.11)
+transaction type: /tmp/bench/b_insert_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 10076
+number of failed transactions: 0 (0.000%)
+latency average = 5.954 ms
+initial connection time = 3.213 ms
+tps = 671.770415 (without initial connection time)
+
+##### 128mb insert_entity solution_c
+pgbench (17.11)
+transaction type: /tmp/bench/c_insert_entity.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 4
+number of threads: 2
+maximum number of tries: 1
+duration: 15 s
+number of transactions actually processed: 28738
+number of failed transactions: 0 (0.000%)
+latency average = 2.088 ms
+initial connection time = 3.256 ms
+tps = 1916.092127 (without initial connection time)
+

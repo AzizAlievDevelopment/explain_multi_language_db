@@ -1,0 +1,354 @@
+############ READ_ENTITY
+---- solution_a
+                                                                         QUERY PLAN                                                                         
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop (actual time=0.030..0.035 rows=2 loops=1)
+   Buffers: shared hit=19
+   InitPlan 1
+     ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.008..0.009 rows=1 loops=1)
+           Index Cond: ((code)::text = 'pm_012345'::text)
+           Buffers: shared hit=4
+   ->  Index Scan using entity_localizations_service_code_entity_code_field_code_en_key on entity_localizations l (actual time=0.021..0.023 rows=2 loops=1)
+         Index Cond: ((service_code = 1) AND (entity_code = 1) AND (field_code = ANY ('{1,2}'::integer[])) AND (entity_id = (InitPlan 1).col1))
+         Buffers: shared hit=11
+   ->  Index Scan using translations_pkey on translations t (actual time=0.005..0.005 rows=1 loops=2)
+         Index Cond: (((resource_type)::text = 'Entity'::text) AND (resource_id = l.id) AND (language_id = 2))
+         Filter: ((status)::text = 'Publish'::text)
+         Rows Removed by Filter: 0
+         Buffers: shared hit=8
+ Planning:
+   Buffers: shared hit=10
+ Planning Time: 0.168 ms
+ Execution Time: 0.068 ms
+(18 rows)
+
+---- solution_b
+                                                                                                     QUERY PLAN                                                                                                      
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop (actual time=0.030..0.036 rows=2 loops=1)
+   Buffers: shared hit=19
+   InitPlan 1
+     ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.009..0.009 rows=1 loops=1)
+           Index Cond: ((code)::text = 'pm_012345'::text)
+           Buffers: shared hit=4
+   ->  Index Scan using entity_localizations_service_code_entity_code_field_code_en_key on entity_localizations l (actual time=0.020..0.024 rows=2 loops=1)
+         Index Cond: (((service_code)::text = 'payment'::text) AND ((entity_code)::text = 'payment_method'::text) AND ((field_code)::text = ANY ('{name,description}'::text[])) AND (entity_id = (InitPlan 1).col1))
+         Buffers: shared hit=11
+   ->  Index Scan using translations_pkey on translations t (actual time=0.005..0.005 rows=1 loops=2)
+         Index Cond: (((resource_type)::text = 'Entity'::text) AND (resource_id = l.id) AND (language_id = 2))
+         Filter: ((status)::text = 'Publish'::text)
+         Rows Removed by Filter: 0
+         Buffers: shared hit=8
+ Planning:
+   Buffers: shared hit=10
+ Planning Time: 0.127 ms
+ Execution Time: 0.057 ms
+(18 rows)
+
+---- solution_c
+                                                                           QUERY PLAN                                                                           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using entity_translations_service_code_entity_code_field_code_ent_key on entity_translations (actual time=0.021..0.024 rows=2 loops=1)
+   Index Cond: ((service_code = 1) AND (entity_code = 1) AND (field_code = ANY ('{1,2}'::integer[])) AND (entity_id = (InitPlan 1).col1) AND (language_id = 2))
+   Filter: ((status)::text = 'Publish'::text)
+   Rows Removed by Filter: 1
+   Buffers: shared hit=11
+   InitPlan 1
+     ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.008..0.008 rows=1 loops=1)
+           Index Cond: ((code)::text = 'pm_012345'::text)
+           Buffers: shared hit=4
+ Planning Time: 0.047 ms
+ Execution Time: 0.038 ms
+(11 rows)
+
+############ READ_STATIC
+---- solution_a
+                                                           QUERY PLAN                                                           
+--------------------------------------------------------------------------------------------------------------------------------
+ Merge Join (actual time=0.601..0.965 rows=850 loops=1)
+   Merge Cond: (t.resource_id = l.id)
+   Buffers: shared hit=242
+   ->  Index Scan using translations_pkey on translations t (actual time=0.014..0.674 rows=2551 loops=1)
+         Index Cond: (((resource_type)::text = 'Static'::text) AND (language_id = 2))
+         Filter: ((status)::text = 'Publish'::text)
+         Rows Removed by Filter: 1053
+         Buffers: shared hit=230
+   ->  Sort (actual time=0.129..0.151 rows=1000 loops=1)
+         Sort Key: l.id
+         Sort Method: quicksort  Memory: 48kB
+         Buffers: shared hit=12
+         ->  Bitmap Heap Scan on static_localizations l (actual time=0.024..0.070 rows=1000 loops=1)
+               Recheck Cond: (service_code = 3)
+               Heap Blocks: exact=7
+               Buffers: shared hit=12
+               ->  Bitmap Index Scan on static_localizations_service_code_code_key (actual time=0.021..0.021 rows=1000 loops=1)
+                     Index Cond: (service_code = 3)
+                     Buffers: shared hit=5
+ Planning:
+   Buffers: shared hit=6
+ Planning Time: 0.096 ms
+ Execution Time: 1.013 ms
+(23 rows)
+
+---- solution_b
+                                                           QUERY PLAN                                                           
+--------------------------------------------------------------------------------------------------------------------------------
+ Merge Join (actual time=0.615..0.930 rows=850 loops=1)
+   Merge Cond: (t.resource_id = l.id)
+   Buffers: shared hit=246
+   ->  Index Scan using translations_pkey on translations t (actual time=0.013..0.611 rows=2551 loops=1)
+         Index Cond: (((resource_type)::text = 'Static'::text) AND (language_id = 2))
+         Filter: ((status)::text = 'Publish'::text)
+         Rows Removed by Filter: 1053
+         Buffers: shared hit=230
+   ->  Sort (actual time=0.155..0.177 rows=1000 loops=1)
+         Sort Key: l.id
+         Sort Method: quicksort  Memory: 56kB
+         Buffers: shared hit=16
+         ->  Bitmap Heap Scan on static_localizations l (actual time=0.027..0.075 rows=1000 loops=1)
+               Recheck Cond: ((service_code)::text = 'news'::text)
+               Heap Blocks: exact=8
+               Buffers: shared hit=16
+               ->  Bitmap Index Scan on static_localizations_service_code_code_key (actual time=0.024..0.024 rows=1000 loops=1)
+                     Index Cond: ((service_code)::text = 'news'::text)
+                     Buffers: shared hit=8
+ Planning:
+   Buffers: shared hit=6
+ Planning Time: 0.104 ms
+ Execution Time: 0.974 ms
+(23 rows)
+
+---- solution_c
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on static_translations (actual time=0.073..0.185 rows=850 loops=1)
+   Recheck Cond: ((service_code = 3) AND (language_id = 2))
+   Filter: ((status)::text = 'Publish'::text)
+   Rows Removed by Filter: 350
+   Heap Blocks: exact=52
+   Buffers: shared hit=72
+   ->  Bitmap Index Scan on static_translations_service_code_code_language_id_version_key (actual time=0.066..0.066 rows=1200 loops=1)
+         Index Cond: ((service_code = 3) AND (language_id = 2))
+         Buffers: shared hit=20
+ Planning Time: 0.024 ms
+ Execution Time: 0.218 ms
+(11 rows)
+
+############ UPDATE_STATUS (в транзакции с откатом)
+---- solution_a
+                                                                            QUERY PLAN                                                                            
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on translations t (actual time=0.142..0.142 rows=0 loops=1)
+   Buffers: shared hit=23 read=5
+   InitPlan 1
+     ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.014..0.014 rows=1 loops=1)
+           Index Cond: ((code)::text = 'pm_000051'::text)
+           Buffers: shared hit=2 read=2
+   ->  Nested Loop (actual time=0.050..0.057 rows=4 loops=1)
+         Buffers: shared hit=8 read=5
+         ->  Index Scan using entity_localizations_service_code_entity_code_field_code_en_key on entity_localizations l (actual time=0.025..0.026 rows=1 loops=1)
+               Index Cond: ((service_code = 1) AND (entity_code = 1) AND (field_code = 1) AND (entity_id = (InitPlan 1).col1))
+               Buffers: shared hit=5 read=3
+         ->  Index Scan using translations_pkey on translations t (actual time=0.024..0.029 rows=4 loops=1)
+               Index Cond: (((resource_type)::text = 'Entity'::text) AND (resource_id = l.id) AND (version = 1))
+               Buffers: shared hit=3 read=2
+ Planning:
+   Buffers: shared hit=13
+ Planning Time: 0.115 ms
+ Execution Time: 0.216 ms
+(18 rows)
+
+---- solution_b
+                                                                                             QUERY PLAN                                                                                              
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on translations t (actual time=0.149..0.150 rows=0 loops=1)
+   Buffers: shared hit=31 read=6 dirtied=3
+   InitPlan 1
+     ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.018..0.019 rows=1 loops=1)
+           Index Cond: ((code)::text = 'pm_000051'::text)
+           Buffers: shared hit=2 read=2
+   ->  Nested Loop (actual time=0.051..0.053 rows=4 loops=1)
+         Buffers: shared hit=6 read=6 dirtied=1
+         ->  Index Scan using entity_localizations_service_code_entity_code_field_code_en_key on entity_localizations l (actual time=0.032..0.032 rows=1 loops=1)
+               Index Cond: (((service_code)::text = 'payment'::text) AND ((entity_code)::text = 'payment_method'::text) AND ((field_code)::text = 'name'::text) AND (entity_id = (InitPlan 1).col1))
+               Buffers: shared hit=5 read=3
+         ->  Index Scan using translations_pkey on translations t (actual time=0.018..0.019 rows=4 loops=1)
+               Index Cond: (((resource_type)::text = 'Entity'::text) AND (resource_id = l.id) AND (version = 1))
+               Buffers: shared hit=1 read=3 dirtied=1
+ Planning:
+   Buffers: shared hit=13
+ Planning Time: 0.132 ms
+ Execution Time: 0.199 ms
+(18 rows)
+
+---- solution_c
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on entity_translations (actual time=0.080..0.080 rows=0 loops=1)
+   Buffers: shared hit=17 read=5 dirtied=1
+   InitPlan 1
+     ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.017..0.017 rows=1 loops=1)
+           Index Cond: ((code)::text = 'pm_000051'::text)
+           Buffers: shared hit=2 read=2
+   ->  Index Scan using entity_translations_service_code_entity_code_field_code_ent_key on entity_translations (actual time=0.042..0.042 rows=4 loops=1)
+         Index Cond: ((service_code = 1) AND (entity_code = 1) AND (field_code = 1) AND (entity_id = (InitPlan 1).col1) AND (version = 1))
+         Buffers: shared hit=3 read=5 dirtied=1
+ Planning:
+   Buffers: shared hit=3
+ Planning Time: 0.056 ms
+ Execution Time: 0.123 ms
+(13 rows)
+
+############ DELETE_ENTITY (в транзакции с откатом)
+---- solution_a
+                                                                         QUERY PLAN                                                                         
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Delete on entity_localizations e (actual time=0.060..0.061 rows=0 loops=1)
+   Buffers: shared hit=20 read=1
+   CTE l
+     ->  Index Scan using entity_localizations_service_code_entity_code_field_code_en_key on entity_localizations (actual time=0.022..0.025 rows=2 loops=1)
+           Index Cond: ((service_code = 1) AND (entity_code = 1) AND (field_code = ANY ('{1,2}'::integer[])) AND (entity_id = (InitPlan 1).col1))
+           Buffers: shared hit=11
+           InitPlan 1
+             ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.014..0.014 rows=1 loops=1)
+                   Index Cond: ((code)::text = 'pm_012345'::text)
+                   Buffers: shared hit=4
+   CTE del_tr
+     ->  Delete on translations t (actual time=0.009..0.016 rows=12 loops=1)
+           Buffers: shared hit=32
+           ->  Nested Loop (actual time=0.008..0.012 rows=12 loops=1)
+                 Buffers: shared hit=8
+                 ->  CTE Scan on l l_1 (actual time=0.001..0.001 rows=2 loops=1)
+                 ->  Index Scan using translations_pkey on translations t (actual time=0.005..0.005 rows=6 loops=2)
+                       Index Cond: (((resource_type)::text = 'Entity'::text) AND (resource_id = l_1.id))
+                       Buffers: shared hit=8
+   ->  Nested Loop (actual time=0.043..0.047 rows=2 loops=1)
+         Buffers: shared hit=18 read=1
+         ->  CTE Scan on l (actual time=0.031..0.034 rows=2 loops=1)
+               Buffers: shared hit=11
+         ->  Index Scan using entity_localizations_pkey on entity_localizations e (actual time=0.006..0.006 rows=1 loops=2)
+               Index Cond: (id = l.id)
+               Buffers: shared hit=7 read=1
+ Planning:
+   Buffers: shared hit=10
+ Planning Time: 0.117 ms
+ Execution Time: 0.135 ms
+(30 rows)
+
+---- solution_b
+                                                                                                      QUERY PLAN                                                                                                       
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Delete on entity_localizations e (actual time=0.051..0.052 rows=0 loops=1)
+   Buffers: shared hit=20 read=1
+   CTE l
+     ->  Index Scan using entity_localizations_service_code_entity_code_field_code_en_key on entity_localizations (actual time=0.018..0.022 rows=2 loops=1)
+           Index Cond: (((service_code)::text = 'payment'::text) AND ((entity_code)::text = 'payment_method'::text) AND ((field_code)::text = ANY ('{name,description}'::text[])) AND (entity_id = (InitPlan 1).col1))
+           Buffers: shared hit=11
+           InitPlan 1
+             ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.008..0.008 rows=1 loops=1)
+                   Index Cond: ((code)::text = 'pm_012345'::text)
+                   Buffers: shared hit=4
+   CTE del_tr
+     ->  Delete on translations t (actual time=0.010..0.017 rows=12 loops=1)
+           Buffers: shared hit=32
+           ->  Nested Loop (actual time=0.009..0.013 rows=12 loops=1)
+                 Buffers: shared hit=8
+                 ->  CTE Scan on l l_1 (actual time=0.001..0.001 rows=2 loops=1)
+                 ->  Index Scan using translations_pkey on translations t (actual time=0.005..0.005 rows=6 loops=2)
+                       Index Cond: (((resource_type)::text = 'Entity'::text) AND (resource_id = l_1.id))
+                       Buffers: shared hit=8
+   ->  Nested Loop (actual time=0.032..0.038 rows=2 loops=1)
+         Buffers: shared hit=18 read=1
+         ->  CTE Scan on l (actual time=0.020..0.024 rows=2 loops=1)
+               Buffers: shared hit=11
+         ->  Index Scan using entity_localizations_pkey on entity_localizations e (actual time=0.006..0.006 rows=1 loops=2)
+               Index Cond: (id = l.id)
+               Buffers: shared hit=7 read=1
+ Planning:
+   Buffers: shared hit=10
+ Planning Time: 0.131 ms
+ Execution Time: 0.123 ms
+(30 rows)
+
+---- solution_c
+                                                                        QUERY PLAN                                                                        
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+ Delete on entity_translations (actual time=0.036..0.036 rows=0 loops=1)
+   Buffers: shared hit=23
+   InitPlan 1
+     ->  Index Scan using payment_methods_code_key on payment_methods (actual time=0.013..0.013 rows=1 loops=1)
+           Index Cond: ((code)::text = 'pm_012345'::text)
+           Buffers: shared hit=4
+   ->  Index Scan using entity_translations_service_code_entity_code_field_code_ent_key on entity_translations (actual time=0.023..0.026 rows=12 loops=1)
+         Index Cond: ((service_code = 1) AND (entity_code = 1) AND (field_code = ANY ('{1,2}'::integer[])) AND (entity_id = (InitPlan 1).col1))
+         Buffers: shared hit=11
+ Planning Time: 0.034 ms
+ Execution Time: 0.056 ms
+(11 rows)
+
+############ INSERT_ENTITY (в транзакции с откатом)
+---- solution_a
+                                        QUERY PLAN                                        
+------------------------------------------------------------------------------------------
+ Insert on translations (actual time=0.218..0.219 rows=0 loops=1)
+   Buffers: shared hit=33 read=19 dirtied=8
+   CTE l
+     ->  Insert on entity_localizations (actual time=0.116..0.117 rows=1 loops=1)
+           Buffers: shared hit=14 read=6 dirtied=3
+           ->  Result (actual time=0.063..0.064 rows=1 loops=1)
+                 Buffers: shared hit=9 read=1 dirtied=1
+   ->  Nested Loop (actual time=0.126..0.128 rows=4 loops=1)
+         Buffers: shared hit=14 read=7 dirtied=3
+         ->  CTE Scan on l (actual time=0.117..0.118 rows=1 loops=1)
+               Buffers: shared hit=14 read=6 dirtied=3
+         ->  Seq Scan on languages lg (actual time=0.007..0.008 rows=4 loops=1)
+               Buffers: shared read=1
+ Planning:
+   Buffers: shared hit=48 read=3
+ Planning Time: 0.236 ms
+ Trigger for constraint translations_language_id_fkey on translations: time=0.134 calls=4
+ Execution Time: 0.366 ms
+(18 rows)
+
+---- solution_b
+                                        QUERY PLAN                                        
+------------------------------------------------------------------------------------------
+ Insert on translations (actual time=0.173..0.174 rows=0 loops=1)
+   Buffers: shared hit=49 dirtied=1 written=1
+   CTE l
+     ->  Insert on entity_localizations (actual time=0.064..0.065 rows=1 loops=1)
+           Buffers: shared hit=17
+           ->  Result (actual time=0.038..0.038 rows=1 loops=1)
+                 Buffers: shared hit=9
+   ->  Nested Loop (actual time=0.068..0.069 rows=4 loops=1)
+         Buffers: shared hit=18
+         ->  CTE Scan on l (actual time=0.065..0.065 rows=1 loops=1)
+               Buffers: shared hit=17
+         ->  Seq Scan on languages lg (actual time=0.002..0.002 rows=4 loops=1)
+               Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=45
+ Planning Time: 0.214 ms
+ Trigger for constraint translations_language_id_fkey on translations: time=0.122 calls=4
+ Execution Time: 0.312 ms
+(18 rows)
+
+---- solution_c
+                                   QUERY PLAN                                    
+---------------------------------------------------------------------------------
+ Insert on entity_translations (actual time=0.147..0.148 rows=0 loops=1)
+   Buffers: shared hit=50
+   CTE u
+     ->  Result (actual time=0.005..0.005 rows=1 loops=1)
+   ->  Nested Loop (actual time=0.047..0.049 rows=4 loops=1)
+         Buffers: shared hit=13
+         ->  CTE Scan on u (actual time=0.006..0.006 rows=1 loops=1)
+         ->  Seq Scan on languages lg (actual time=0.002..0.003 rows=4 loops=1)
+               Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=45
+ Planning Time: 0.226 ms
+ Trigger for constraint entity_translations_language_id_fkey: time=0.087 calls=4
+ Execution Time: 0.245 ms
+(14 rows)
+
